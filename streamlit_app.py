@@ -4,6 +4,7 @@ import altair as alt
 import numpy as np
 import pandas as pd
 import streamlit as st
+import streamlit_sortables
 from pymongo import MongoClient
 
 # MongoDB setup
@@ -132,96 +133,163 @@ if submitted:
     st.dataframe(df_new, use_container_width=True, hide_index=True)
     st.session_state.df = fetch_tasks()
 
-# View and edit existing tickets
-st.header("Existing task tickets")
+# Tabs for Table and Board View
+tab_table, tab_board = st.tabs(["Table View", "Board View"])
 
-# Single dropdown for filter type, then show appropriate filter
-filter_type = st.selectbox("Filter by...", ["None", "Status", "Priority"])
-filtered_df = st.session_state.df.copy()
-if filter_type == "Status":
-    status_options = sorted(st.session_state.df["Status"].unique())
-    selected_status = st.selectbox("Select Status", status_options)
-    filtered_df = filtered_df[filtered_df.Status == selected_status]
-elif filter_type == "Priority":
-    priority_options = sorted(st.session_state.df["Priority"].unique())
-    selected_priority = st.selectbox("Select Priority", priority_options)
-    filtered_df = filtered_df[filtered_df.Priority == selected_priority]
+with tab_table:
+    # View and edit existing tickets
+    st.header("Existing task tickets")
 
-st.write(f"Number of task tickets: `{len(filtered_df)}`")
-st.info(
-    "You can edit the task tickets by double clicking on a cell. Note how the plots below "
-    "update automatically! You can also sort the table by clicking on the column headers.",
-    icon="✍️",
-)
+    # Single dropdown for filter type, then show appropriate filter
+    filter_type = st.selectbox("Filter by...", ["None", "Status", "Priority"])
+    filtered_df = st.session_state.df.copy()
+    if filter_type == "Status":
+        status_options = sorted(st.session_state.df["Status"].unique())
+        selected_status = st.selectbox("Select Status", status_options)
+        filtered_df = filtered_df[filtered_df.Status == selected_status]
+    elif filter_type == "Priority":
+        priority_options = sorted(st.session_state.df["Priority"].unique())
+        selected_priority = st.selectbox("Select Priority", priority_options)
+        filtered_df = filtered_df[filtered_df.Priority == selected_priority]
 
-st.session_state.df = fetch_tasks()  # Always fetch sorted
-st.session_state.df = ensure_due_date_is_date(st.session_state.df)
-edited_df = st.data_editor(
-    filtered_df,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "Status": st.column_config.SelectboxColumn(
-            "Status",
-            help="Task ticket status",
-            options=["Open", "In Progress", "Closed"],
-            required=True,
-        ),
-        "Priority": st.column_config.SelectboxColumn(
-            "Priority",
-            help="Priority",
-            options=["High", "Medium", "Low"],
-            required=True,
-        ),
-        "Due Date": st.column_config.DateColumn(
-            "Due Date",
-            help="Due date for the task",
-            format="YYYY-MM-DD",
-            required=True,
-        ),
-    },
-    disabled=["ID", "Date Submitted"],
-)
-
-if not edited_df.equals(filtered_df):
-    update_tasks(edited_df)
-    st.session_state.df = fetch_tasks()
-    st.success("Changes saved.")
-
-# Statistics
-st.header("Statistics")
-col1, col2, col3 = st.columns(3)
-num_open_task_tickets = len(filtered_df[filtered_df.Status == "Open"])
-col1.metric(label="Number of open task tickets",
-            value=num_open_task_tickets, delta=10)
-col2.metric(label="First response time (hours)", value=5.2, delta=-1.5)
-col3.metric(label="Average resolution time (hours)", value=16, delta=2)
-
-st.write("")
-st.write("##### Task ticket status per month")
-status_plot = (
-    alt.Chart(filtered_df)
-    .mark_bar()
-    .encode(
-        x="month(Date Submitted):O",
-        y="count():Q",
-        xOffset="Status:N",
-        color="Status:N",
+    st.write(f"Number of task tickets: `{len(filtered_df)}`")
+    st.info(
+        "You can edit the task tickets by double clicking on a cell. Note how the plots below "
+        "update automatically! You can also sort the table by clicking on the column headers.",
+        icon="✍️",
     )
-    .configure_legend(
-        orient="bottom", titleFontSize=14, labelFontSize=14, titlePadding=5
-    )
-)
-st.altair_chart(status_plot, use_container_width=True, theme="streamlit")
 
-st.write("##### Current task ticket priorities")
-priority_plot = (
-    alt.Chart(filtered_df)
-    .mark_arc()
-    .encode(theta="count():Q", color="Priority:N")
-    .properties(height=300)
-    .configure_legend(
-        orient="bottom", titleFontSize=14, labelFontSize=14, titlePadding=5
+    st.session_state.df = fetch_tasks()  # Always fetch sorted
+    st.session_state.df = ensure_due_date_is_date(st.session_state.df)
+    edited_df = st.data_editor(
+        filtered_df,
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Status": st.column_config.SelectboxColumn(
+                "Status",
+                help="Task ticket status",
+                options=["Open", "In Progress", "Closed"],
+                required=True,
+            ),
+            "Priority": st.column_config.SelectboxColumn(
+                "Priority",
+                help="Priority",
+                options=["High", "Medium", "Low"],
+                required=True,
+            ),
+            "Due Date": st.column_config.DateColumn(
+                "Due Date",
+                help="Due date for the task",
+                format="YYYY-MM-DD",
+                required=True,
+            ),
+        },
+        disabled=["ID", "Date Submitted"],
     )
-)
-st.altair_chart(priority_plot, use_container_width=True, theme="streamlit")
+
+    if not edited_df.equals(filtered_df):
+        update_tasks(edited_df)
+        st.session_state.df = fetch_tasks()
+        st.success("Changes saved.")
+
+    # Statistics
+    st.header("Statistics")
+    col1, col2, col3 = st.columns(3)
+    num_open_task_tickets = len(filtered_df[filtered_df.Status == "Open"])
+    col1.metric(label="Number of open task tickets",
+                value=num_open_task_tickets, delta=10)
+    col2.metric(label="First response time (hours)", value=5.2, delta=-1.5)
+    col3.metric(label="Average resolution time (hours)", value=16, delta=2)
+
+    st.write("")
+    st.write("##### Task ticket status per month")
+    status_plot = (
+        alt.Chart(filtered_df)
+        .mark_bar()
+        .encode(
+            x="month(Date Submitted):O",
+            y="count():Q",
+            xOffset="Status:N",
+            color="Status:N",
+        )
+        .configure_legend(
+            orient="bottom", titleFontSize=14, labelFontSize=14, titlePadding=5
+        )
+    )
+    st.altair_chart(status_plot, use_container_width=True, theme="streamlit")
+
+    st.write("##### Current task ticket priorities")
+    priority_plot = (
+        alt.Chart(filtered_df)
+        .mark_arc()
+        .encode(theta="count():Q", color="Priority:N")
+        .properties(height=300)
+        .configure_legend(
+            orient="bottom", titleFontSize=14, labelFontSize=14, titlePadding=5
+        )
+    )
+    st.altair_chart(priority_plot, use_container_width=True, theme="streamlit")
+
+with tab_board:
+    st.header("Board View (Drag & Drop)")
+    statuses = ["Open", "In Progress", "Closed"]
+    board_df = st.session_state.df.copy()
+    # Prepare items per status
+    columns_payload = {
+        status: [
+            f"{r.ID}: {r.Task[:40]}{'...' if len(r.Task) > 40 else ''}"
+            for _, r in board_df[board_df.Status == status].iterrows()
+        ]
+        for status in statuses
+    }
+    sorted_columns = streamlit_sortables.sort_items(
+        columns_payload,
+        multi_containers=True,
+        direction="vertical",
+        styles={
+            "container": {
+                "border": "1px solid #444",
+                "borderRadius": "6px",
+                "background": "#181818",
+                "padding": "8px",
+                "minHeight": "420px"
+            },
+            "containerHeader": {
+                "fontWeight": "600",
+                "padding": "4px 0 8px 0",
+                "color": "#eee",
+                "textAlign": "center"
+            },
+            "item": {
+                "padding": "8px",
+                "margin": "6px 0",
+                "border": "1px solid #555",
+                "borderRadius": "6px",
+                "background": "linear-gradient(135deg,#242424,#303030)",
+                "color": "#fafafa",
+                "fontSize": "12px",
+                "lineHeight": "1.3",
+                "boxShadow": "2px 2px 4px rgba(0,0,0,0.4)",
+            },
+            "draggingItem": {"opacity": "0.35"},
+        },
+    )
+    # Reverse lookup
+    original_status = {
+        label.split(":")[0]: status
+        for status, labels in columns_payload.items()
+        for label in labels
+    }
+    changed = False
+    for new_status, labels in sorted_columns.items():
+        for label in labels:
+            task_id = label.split(":")[0]
+            if original_status.get(task_id) != new_status:
+                st.session_state.df.loc[st.session_state.df.ID ==
+                                        task_id, "Status"] = new_status
+                changed = True
+    if changed:
+        update_tasks(st.session_state.df)
+        st.session_state.df = fetch_tasks()
+        st.experimental_rerun()
