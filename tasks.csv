@@ -1,0 +1,102 @@
+ID,Task,Status,Priority,Date Submitted,Due Date
+Task-1101,Attend HSA Kids Orientation,Open,High,2025-08-07,2025-08-15
+Task-1100,Website performance degradation,Closed,Low,2023-06-06 00:00:00,2025-08-15
+Task-1099,Collaboration tool not sending notifications,In Progress,Medium,2023-07-15 00:00:00,2025-08-15
+Task-1098,System updates causing compatibility issues,Closed,Medium,2023-11-15 00:00:00,2025-08-15
+Task-1097,Database connection failure,Closed,High,2023-08-23 00:00:00,2025-08-15
+Task-1096,Security vulnerability identified,Open,Medium,2023-08-29 00:00:00,2025-08-15
+Task-1095,Website performance degradation,Closed,Medium,2023-06-27 00:00:00,2025-08-15
+Task-1094,Customer data not loading in CRM,Open,Low,2023-06-24 00:00:00,2025-08-15
+Task-1093,Database connection failure,Closed,Low,2023-11-05 00:00:00,2025-08-15
+Task-1092,Database connection failure,In Progress,Low,2023-07-23 00:00:00,2025-08-15
+Task-1091,Email server downtime,Closed,Low,2023-11-25 00:00:00,2025-08-15
+Task-1090,Security vulnerability identified,Open,High,2023-10-05 00:00:00,2025-08-15
+Task-1089,Printer not responding to print commands,Open,Low,2023-11-09 00:00:00,2025-08-15
+Task-1088,Software application crashing on startup,In Progress,Medium,2023-06-20 00:00:00,2025-08-15
+Task-1087,Mobile application not syncing data,Closed,High,2023-11-26 00:00:00,2025-08-15
+Task-1086,Login authentication problems,Closed,Medium,2023-06-25 00:00:00,2025-08-15
+Task-1085,Software application crashing on startup,In Progress,Medium,2023-09-11 00:00:00,2025-08-15
+Task-1084,Network connectivity issues in the office,Closed,Medium,2023-08-07 00:00:00,2025-08-15
+Task-1083,Mobile application not syncing data,Closed,Low,2023-10-29 00:00:00,2025-08-15
+Task-1082,Mobile application not syncing data,Open,Low,2023-08-28 00:00:00,2025-08-15
+Task-1081,Intrusion detection system alerts,Closed,High,2023-08-24 00:00:00,2025-08-15
+Task-1080,Employee unable to access shared files,Closed,High,2023-10-14 00:00:00,2025-08-15
+Task-1079,File server running out of storage space,In Progress,Low,2023-08-30 00:00:00,2025-08-15
+Task-1078,System updates causing compatibility issues,In Progress,Medium,2023-08-30 00:00:00,2025-08-15
+Task-1077,System updates causing compatibility issues,Open,High,2023-11-25 00:00:00,2025-08-15
+Task-1076,Customer data not loading in CRM,Closed,Low,2023-11-29 00:00:00,2025-08-15
+Task-1075,Mobile application not syncing data,Closed,Low,2023-07-11 00:00:00,2025-08-15
+Task-1074,Collaboration tool not sending notifications,Closed,Low,2023-11-30 00:00:00,2025-08-15
+Task-1073,Printer not responding to print commands,Open,Medium,2023-07-13 00:00:00,2025-08-15
+Task-1072,Data backup failure,Open,Low,2023-09-24 00:00:00,2025-08-15
+Task-1071,Customer data not loading in CRM,In Progress,Low,2023-11-13 00:00:00,2025-08-15
+Task-1070,Website performance degradation,Open,Low,2023-08-05 00:00:00,2025-08-15
+Task-1069,Hardware malfunction in the server room,Closed,Low,2023-11-08 00:00:00,2025-08-15
+Task-1068,Website performance degradation,Closed,High,2023-11-04 00:00:00,2025-08-15
+Task-1067,Inventory management system errors,Open,High,2023-08-12 00:00:00,2025-08-15
+Task-1066,Email server downtime,Closed,Low,2023-08-07 00:00:00,2025-08-15
+Task-1065,VPN connection problems for remote employees,Closed,Medium,2023-08-25 00:00:00,2025-08-15
+Task-1064,Inventory management system errors,Open,High,2023-06-18 00:00:00,2025-08-15
+Task-1063,Hardware malfunction in the server room,Open,Low,2023-07-09 00:00:00,2025-08-15
+Task-1062,Software application crashing on startup,Closed,High,2023-10-30 00:00:00,2025-08-15
+Task-1061,Collaboration tool not sending notifications,Closed,High,2023-11-12 00:00:00,2025-08-15
+Task-1060,System updates causing compatibility issues,Closed,Medium,2023-10-15 00:00:00,2025-08-15
+Task-1059,Website performance degradation,In Progress,Low,2023-08-14 00:00:00,2025-08-15
+Task-1058,Mobile application not syncing data,In Progress,Low,2023-07-11 00:00:00,2025-08-15
+Task-1057,Security vulnerability identified,In Progress,Medium,2023-06-05 00:00:00,2025-08-15
+Task-1056,System updates causing compatibility issues,Open,Medium,2023-09-01 00:00:00,2025-08-15
+Task-1055,Printer not responding to print commands,In Progress,Low,2023-11-13 00:00:00,2025-08-15
+Task-1054,VPN connection problems for remote employees,Open,Low,2023-07-05 00:00:00,2025-08-15
+Task-1053,Intrusion detection system alerts,Open,Medium,2023-07-14 00:00:00,2025-08-15
+Task-1052,Email server downtime,In Progress,High,2023-09-22 00:00:00,2025-08-15
+Task-1051,Inventory management system errors,In Progress,High,2023-08-20 00:00:00,2025-08-15
+Task-1050,Security vulnerability identified,In Progress,Medium,2023-08-15 00:00:00,2025-08-15
+Task-1049,Email server downtime,Closed,High,2023-08-28 00:00:00,2025-08-15
+Task-1048,Software application crashing on startup,In Progress,Medium,2023-11-29 00:00:00,2025-08-15
+Task-1047,Login authentication problems,Closed,High,2023-08-18 00:00:00,2025-08-15
+Task-1046,Employee unable to access shared files,Open,High,2023-09-26 00:00:00,2025-08-15
+Task-1045,Email server downtime,Closed,Low,2023-10-24 00:00:00,2025-08-15
+Task-1044,Inventory management system errors,In Progress,Low,2023-09-07 00:00:00,2025-08-15
+Task-1043,Mobile application not syncing data,Open,High,2023-09-02 00:00:00,2025-08-15
+Task-1042,Software application crashing on startup,Open,High,2023-07-25 00:00:00,2025-08-15
+Task-1041,Employee unable to access shared files,Open,Low,2023-08-26 00:00:00,2025-08-15
+Task-1040,Email server downtime,Closed,Low,2023-07-29 00:00:00,2025-08-15
+Task-1039,VPN connection problems for remote employees,In Progress,Low,2023-11-09 00:00:00,2025-08-15
+Task-1038,File server running out of storage space,Open,Medium,2023-08-19 00:00:00,2025-08-15
+Task-1037,System updates causing compatibility issues,Open,High,2023-06-04 00:00:00,2025-08-15
+Task-1036,Security vulnerability identified,Open,Low,2023-09-07 00:00:00,2025-08-15
+Task-1035,VPN connection problems for remote employees,Closed,High,2023-08-20 00:00:00,2025-08-15
+Task-1034,Security vulnerability identified,Closed,Medium,2023-09-21 00:00:00,2025-08-15
+Task-1033,File server running out of storage space,In Progress,Medium,2023-08-29 00:00:00,2025-08-15
+Task-1032,VoIP phone system issues,Closed,Low,2023-11-26 00:00:00,2025-08-15
+Task-1031,Inventory management system errors,Open,Medium,2023-08-10 00:00:00,2025-08-15
+Task-1030,System updates causing compatibility issues,In Progress,High,2023-10-15 00:00:00,2025-08-15
+Task-1029,VoIP phone system issues,Open,Low,2023-11-11 00:00:00,2025-08-15
+Task-1028,Hardware malfunction in the server room,Open,High,2023-10-12 00:00:00,2025-08-15
+Task-1027,System updates causing compatibility issues,Closed,High,2023-09-15 00:00:00,2025-08-15
+Task-1026,VoIP phone system issues,In Progress,Medium,2023-08-12 00:00:00,2025-08-15
+Task-1025,Network connectivity issues in the office,Closed,Medium,2023-08-20 00:00:00,2025-08-15
+Task-1024,Website performance degradation,Closed,Medium,2023-09-22 00:00:00,2025-08-15
+Task-1023,Hardware malfunction in the server room,In Progress,Medium,2023-08-27 00:00:00,2025-08-15
+Task-1022,Network connectivity issues in the office,Open,Medium,2023-06-06 00:00:00,2025-08-15
+Task-1021,Mobile application not syncing data,Open,Low,2023-07-03 00:00:00,2025-08-15
+Task-1020,Security vulnerability identified,In Progress,High,2023-11-30 00:00:00,2025-08-15
+Task-1019,Database connection failure,Open,High,2023-09-19 00:00:00,2025-08-15
+Task-1018,Customer data not loading in CRM,In Progress,High,2023-10-26 00:00:00,2025-08-15
+Task-1017,Intrusion detection system alerts,In Progress,High,2023-08-13 00:00:00,2025-08-15
+Task-1016,Security vulnerability identified,Closed,Medium,2023-08-29 00:00:00,2025-08-15
+Task-1015,Printer not responding to print commands,In Progress,High,2023-07-23 00:00:00,2025-08-15
+Task-1014,Printer not responding to print commands,Closed,Low,2023-10-08 00:00:00,2025-08-15
+Task-1013,Network connectivity issues in the office,Open,Low,2023-08-05 00:00:00,2025-08-15
+Task-1012,Data backup failure,Open,High,2023-07-03 00:00:00,2025-08-15
+Task-1011,Employee unable to access shared files,Open,High,2023-07-11 00:00:00,2025-08-15
+Task-1010,Website performance degradation,Open,Low,2023-11-01 00:00:00,2025-08-15
+Task-1009,Hardware malfunction in the server room,Closed,Low,2023-10-28 00:00:00,2025-08-15
+Task-1008,Website performance degradation,Open,Medium,2023-09-05 00:00:00,2025-08-15
+Task-1007,Hardware malfunction in the server room,In Progress,Low,2023-06-08 00:00:00,2025-08-15
+Task-1006,Security vulnerability identified,In Progress,Medium,2023-08-01 00:00:00,2025-08-15
+Task-1005,Mobile application not syncing data,In Progress,Medium,2023-11-04 00:00:00,2025-08-15
+Task-1004,Software application crashing on startup,Closed,Medium,2023-10-14 00:00:00,2025-08-15
+Task-1003,Network connectivity issues in the office,Open,Medium,2023-10-21 00:00:00,2025-08-15
+Task-1002,File server running out of storage space,Open,Medium,2023-07-07 00:00:00,2025-08-15
+Task-1001,Data backup failure,Open,High,2023-08-17 00:00:00,2025-08-15
