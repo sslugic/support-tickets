@@ -244,52 +244,52 @@ with tab_board:
     statuses = ["Open", "In Progress", "Closed"]
     board_df = st.session_state.df.copy()
 
-    # Defensive: ensure columns_payload is a dict of lists of strings, no None values
     columns_payload = {}
     for status in statuses:
         items = []
         for _, r in board_df[board_df.Status == status].iterrows():
             task_id = str(r["ID"]) if "ID" in r and r["ID"] is not None else ""
-            task_text = str(
-                r["Task"]) if "Task" in r and r["Task"] is not None else ""
+            task_text = str(r["Task"]) if "Task" in r and r["Task"] is not None else ""
             label = f"{task_id}: {task_text[:40]}{'...' if len(task_text) > 40 else ''}"
-            # Only add if task_id and task_text are not empty and not nan
             if task_id and task_id != "nan" and task_text and task_text != "nan":
                 items.append(label)
-        # Only add non-empty lists
         if items:
             columns_payload[status] = items
 
-    # If all columns are empty, show a message and skip sort_items
     if not columns_payload:
         st.info("No tasks to display in board view.")
     else:
-        # Ensure all values are lists of strings (no None, no NaN)
-        for k, v in columns_payload.items():
-            columns_payload[k] = [str(x) for x in v if x and x != "nan"]
-
         try:
+            # Remove 'styles' argument, only use supported arguments
             sorted_columns = sort_items(
                 columns_payload,
                 multi_containers=True,
-                direction="vertical",
-                styles={
-                    "container": {
-                        "border": "1px solid #444",
-                        "borderRadius": "6px",
-                        "background": "#181818",
-                        "padding": "8px",
-                        "minHeight": "420px"
-                    },
-                    "containerHeader": {
-                        "fontWeight": "600",
-                        "padding": "4px 0 8px 0",
-                        "color": "#eee",
-                        "textAlign": "center"
-                    },
-                    "item": {
-                        "padding": "8px",
-                        "margin": "6px 0",
+                direction="vertical"
+            )
+        except Exception as e:
+            st.error(f"Board view error: {e}")
+            sorted_columns = columns_payload
+
+        original_status = {}
+        for status, labels in columns_payload.items():
+            for label in labels:
+                parts = label.split(":")
+                if len(parts) > 1:
+                    task_id = parts[0].strip()
+                    original_status[task_id] = status
+        changed = False
+        for new_status, labels in sorted_columns.items():
+            for label in labels:
+                parts = label.split(":")
+                if len(parts) > 1:
+                    task_id = parts[0].strip()
+                    if original_status.get(task_id) != new_status:
+                        st.session_state.df.loc[st.session_state.df.ID == task_id, "Status"] = new_status
+                        changed = True
+        if changed:
+            update_tasks(st.session_state.df)
+            st.session_state.df = fetch_tasks()
+            st.experimental_rerun()
                         "border": "1px solid #555",
                         "borderRadius": "6px",
                         "background": "linear-gradient(135deg,#242424,#303030)",
