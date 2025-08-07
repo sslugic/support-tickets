@@ -6,6 +6,7 @@ import pandas as pd
 import streamlit as st
 import streamlit_sortables
 from pymongo import MongoClient
+from streamlit_sortables import sort_items
 
 # MongoDB setup
 MONGO_URI = "mongodb+srv://slugics:B8KaWcLehYvwkNHF@cluster0.xc2qsoh.mongodb.net/"
@@ -232,7 +233,7 @@ with tab_table:
     st.altair_chart(priority_plot, use_container_width=True, theme="streamlit")
 
 with tab_board:
-    st.header("Board View (Drag & Drop)")
+    st.header("Board View")
     statuses = ["Open", "In Progress", "Closed"]
     board_df = st.session_state.df.copy()
     # Prepare items per status
@@ -243,7 +244,7 @@ with tab_board:
         ]
         for status in statuses
     }
-    sorted_columns = streamlit_sortables.sort_items(
+    sorted_columns = sort_items(
         columns_payload,
         multi_containers=True,
         direction="vertical",
@@ -271,6 +272,7 @@ with tab_board:
                 "fontSize": "12px",
                 "lineHeight": "1.3",
                 "boxShadow": "2px 2px 4px rgba(0,0,0,0.4)",
+                "cursor": "grab"
             },
             "draggingItem": {"opacity": "0.35"},
         },
@@ -292,4 +294,5 @@ with tab_board:
     if changed:
         update_tasks(st.session_state.df)
         st.session_state.df = fetch_tasks()
+        st.experimental_rerun()
         st.experimental_rerun()
