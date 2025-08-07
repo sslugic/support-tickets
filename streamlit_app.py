@@ -237,13 +237,17 @@ with tab_board:
     statuses = ["Open", "In Progress", "Closed"]
     board_df = st.session_state.df.copy()
     # Prepare items per status
-    columns_payload = {
-        status: [
-            f"{str(r['ID'])}: {str(r['Task'])[:40]}{'...' if len(str(r['Task'])) > 40 else ''}"
-            for _, r in board_df[board_df.Status == status].iterrows()
-        ]
-        for status in statuses
-    }
+    columns_payload = {}
+    for status in statuses:
+        items = []
+        for _, r in board_df[board_df.Status == status].iterrows():
+            # Ensure r is a Series and all values are string
+            task_id = str(r["ID"])
+            task_text = str(r["Task"])
+            label = f"{task_id}: {task_text[:40]}{'...' if len(task_text) > 40 else ''}"
+            items.append(label)
+        columns_payload[status] = items
+
     sorted_columns = sort_items(
         columns_payload,
         multi_containers=True,
@@ -278,18 +282,17 @@ with tab_board:
         },
     )
     # Reverse lookup
-    original_status = {
-        str(label.split(":")[0]): status
-        for status, labels in columns_payload.items()
-        for label in labels
-    }
+    original_status = {}
+    for status, labels in columns_payload.items():
+        for label in labels:
+            task_id = label.split(":")[0]
+            original_status[task_id] = status
     changed = False
     for new_status, labels in sorted_columns.items():
         for label in labels:
-            task_id = str(label.split(":")[0])
+            task_id = label.split(":")[0]
             if original_status.get(task_id) != new_status:
-                st.session_state.df.loc[st.session_state.df.ID ==
-                                        task_id, "Status"] = new_status
+                st.session_state.df.loc[st.session_state.df.ID == task_id, "Status"] = new_status
                 changed = True
     if changed:
         update_tasks(st.session_state.df)
