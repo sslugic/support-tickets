@@ -16,6 +16,7 @@ collection = db[COLLECTION_NAME]
 
 
 def fetch_tasks():
+    # Exclude _id field from MongoDB results to avoid Arrow/Streamlit errors
     tasks = list(collection.find({}, {"_id": 0}))
     if not tasks:
         # Seed initial data if empty
