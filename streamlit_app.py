@@ -249,8 +249,7 @@ with tab_board:
         items = []
         for _, r in board_df[board_df.Status == status].iterrows():
             task_id = str(r["ID"]) if "ID" in r and r["ID"] is not None else ""
-            task_text = str(
-                r["Task"]) if "Task" in r and r["Task"] is not None else ""
+            task_text = str(r["Task"]) if "Task" in r and r["Task"] is not None else ""
             label = f"{task_id}: {task_text[:40]}{'...' if len(task_text) > 40 else ''}"
             if task_id and task_id != "nan" and task_text and task_text != "nan":
                 items.append(label)
@@ -281,11 +280,12 @@ with tab_board:
                 if len(parts) > 1:
                     task_id = parts[0].strip()
                     if original_status.get(task_id) != new_status:
-                        st.session_state.df.loc[st.session_state.df.ID ==
-                            task_id, "Status"] = new_status
+                        st.session_state.df.loc[st.session_state.df.ID == task_id, "Status"] = new_status
                         changed = True
         if changed:
             update_tasks(st.session_state.df)
+            st.session_state.df = fetch_tasks()
+            st.experimental_rerun()
             st.session_state.df = fetch_tasks()
             st.experimental_rerun()
             st.session_state.df = fetch_tasks()
