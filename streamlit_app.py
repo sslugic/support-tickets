@@ -294,6 +294,8 @@ with tab_board:
             st.experimental_rerun()
             st.session_state.df = fetch_tasks()
             st.experimental_rerun()
+            st.session_state.df = fetch_tasks()
+            st.experimental_rerun()
         if changed:
             update_tasks(st.session_state.df)
             st.session_state.df = fetch_tasks()
