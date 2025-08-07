@@ -7,13 +7,13 @@ import pandas as pd
 import streamlit as st
 
 # Show app title and description.
-st.set_page_config(page_title="Support tickets", page_icon="🎫")
-st.title("🎫 Support tickets")
+st.set_page_config(page_title="Task Tickets", page_icon="🎫")
+st.title("🎫 Task Tickets")
 st.write(
     """
     This app shows how you can build an internal tool in Streamlit. Here, we are 
-    implementing a support ticket workflow. The user can create a ticket, edit 
-    existing tickets, and view some statistics.
+    implementing a task ticket workflow. The user can create a task ticket, edit 
+    existing task tickets, and view some statistics.
     """
 )
 
@@ -23,8 +23,8 @@ if "df" not in st.session_state:
     # Set seed for reproducibility.
     np.random.seed(42)
 
-    # Make up some fake issue descriptions.
-    issue_descriptions = [
+    # Make up some fake task descriptions.
+    task_descriptions = [
         "Network connectivity issues in the office",
         "Software application crashing on startup",
         "Printer not responding to print commands",
@@ -47,14 +47,15 @@ if "df" not in st.session_state:
         "Collaboration tool not sending notifications",
     ]
 
-    # Generate the dataframe with 100 rows/tickets.
+    # Generate the dataframe with 100 rows/task tickets.
     data = {
-        "ID": [f"TICKET-{i}" for i in range(1100, 1000, -1)],
-        "Issue": np.random.choice(issue_descriptions, size=100),
+        "ID": [f"Task-{i:04d}" for i in range(1100, 1000, -1)],
+        "Task": np.random.choice(task_descriptions, size=100),
         "Status": np.random.choice(["Open", "In Progress", "Closed"], size=100),
         "Priority": np.random.choice(["High", "Medium", "Low"], size=100),
         "Date Submitted": [
-            datetime.date(2023, 6, 1) + datetime.timedelta(days=random.randint(0, 182))
+            datetime.date(2023, 6, 1) +
+            datetime.timedelta(days=random.randint(0, 182))
             for _ in range(100)
         ],
     }
@@ -65,26 +66,22 @@ if "df" not in st.session_state:
     st.session_state.df = df
 
 
-# Show a section to add a new ticket.
-st.header("Add a ticket")
+# Show a section to add a new task ticket.
+st.header("Add a task ticket")
 
-# We're adding tickets via an `st.form` and some input widgets. If widgets are used
-# in a form, the app will only rerun once the submit button is pressed.
-with st.form("add_ticket_form"):
-    issue = st.text_area("Describe the issue")
+with st.form("add_task_ticket_form"):
+    task = st.text_area("Describe the task")
     priority = st.selectbox("Priority", ["High", "Medium", "Low"])
     submitted = st.form_submit_button("Submit")
 
 if submitted:
-    # Make a dataframe for the new ticket and append it to the dataframe in session
-    # state.
-    recent_ticket_number = int(max(st.session_state.df.ID).split("-")[1])
+    recent_task_number = int(max(st.session_state.df.ID).split("-")[1])
     today = datetime.datetime.now().strftime("%m-%d-%Y")
     df_new = pd.DataFrame(
         [
             {
-                "ID": f"TICKET-{recent_ticket_number+1}",
-                "Issue": issue,
+                "ID": f"Task-{recent_task_number+1:04d}",
+                "Task": task,
                 "Status": "Open",
                 "Priority": priority,
                 "Date Submitted": today,
@@ -92,23 +89,20 @@ if submitted:
         ]
     )
 
-    # Show a little success message.
-    st.write("Ticket submitted! Here are the ticket details:")
+    st.write("Task ticket submitted! Here are the ticket details:")
     st.dataframe(df_new, use_container_width=True, hide_index=True)
     st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
 
-# Show section to view and edit existing tickets in a table.
-st.header("Existing tickets")
-st.write(f"Number of tickets: `{len(st.session_state.df)}`")
+# Show section to view and edit existing task tickets in a table.
+st.header("Existing task tickets")
+st.write(f"Number of task tickets: `{len(st.session_state.df)}`")
 
 st.info(
-    "You can edit the tickets by double clicking on a cell. Note how the plots below "
+    "You can edit the task tickets by double clicking on a cell. Note how the plots below "
     "update automatically! You can also sort the table by clicking on the column headers.",
     icon="✍️",
 )
 
-# Show the tickets dataframe with `st.data_editor`. This lets the user edit the table
-# cells. The edited data is returned as a new dataframe.
 edited_df = st.data_editor(
     st.session_state.df,
     use_container_width=True,
@@ -116,7 +110,7 @@ edited_df = st.data_editor(
     column_config={
         "Status": st.column_config.SelectboxColumn(
             "Status",
-            help="Ticket status",
+            help="Task ticket status",
             options=["Open", "In Progress", "Closed"],
             required=True,
         ),
@@ -127,23 +121,22 @@ edited_df = st.data_editor(
             required=True,
         ),
     },
-    # Disable editing the ID and Date Submitted columns.
     disabled=["ID", "Date Submitted"],
 )
 
-# Show some metrics and charts about the ticket.
+# Show some metrics and charts about the task tickets.
 st.header("Statistics")
 
-# Show metrics side by side using `st.columns` and `st.metric`.
 col1, col2, col3 = st.columns(3)
-num_open_tickets = len(st.session_state.df[st.session_state.df.Status == "Open"])
-col1.metric(label="Number of open tickets", value=num_open_tickets, delta=10)
+num_open_task_tickets = len(
+    st.session_state.df[st.session_state.df.Status == "Open"])
+col1.metric(label="Number of open task tickets",
+            value=num_open_task_tickets, delta=10)
 col2.metric(label="First response time (hours)", value=5.2, delta=-1.5)
 col3.metric(label="Average resolution time (hours)", value=16, delta=2)
 
-# Show two Altair charts using `st.altair_chart`.
 st.write("")
-st.write("##### Ticket status per month")
+st.write("##### Task ticket status per month")
 status_plot = (
     alt.Chart(edited_df)
     .mark_bar()
@@ -159,7 +152,17 @@ status_plot = (
 )
 st.altair_chart(status_plot, use_container_width=True, theme="streamlit")
 
-st.write("##### Current ticket priorities")
+st.write("##### Current task ticket priorities")
+priority_plot = (
+    alt.Chart(edited_df)
+    .mark_arc()
+    .encode(theta="count():Q", color="Priority:N")
+    .properties(height=300)
+    .configure_legend(
+        orient="bottom", titleFontSize=14, labelFontSize=14, titlePadding=5
+    )
+)
+st.altair_chart(priority_plot, use_container_width=True, theme="streamlit")
 priority_plot = (
     alt.Chart(edited_df)
     .mark_arc()
