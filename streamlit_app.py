@@ -241,12 +241,16 @@ with tab_board:
     for status in statuses:
         items = []
         for _, r in board_df[board_df.Status == status].iterrows():
-            # Ensure r is a Series and all values are string
-            task_id = str(r["ID"])
-            task_text = str(r["Task"])
+            # Defensive: ensure r is a dict/Series and all values are string
+            task_id = str(r["ID"]) if "ID" in r else ""
+            task_text = str(r["Task"]) if "Task" in r else ""
             label = f"{task_id}: {task_text[:40]}{'...' if len(task_text) > 40 else ''}"
             items.append(label)
         columns_payload[status] = items
+
+    # Defensive: ensure columns_payload is a dict of lists of strings
+    for k, v in columns_payload.items():
+        columns_payload[k] = [str(x) for x in v]
 
     sorted_columns = sort_items(
         columns_payload,
@@ -281,19 +285,24 @@ with tab_board:
             "draggingItem": {"opacity": "0.35"},
         },
     )
-    # Reverse lookup
+    # Defensive: only update if label format is correct
     original_status = {}
     for status, labels in columns_payload.items():
         for label in labels:
-            task_id = label.split(":")[0]
-            original_status[task_id] = status
+            parts = label.split(":")
+            if len(parts) > 1:
+                task_id = parts[0].strip()
+                original_status[task_id] = status
     changed = False
     for new_status, labels in sorted_columns.items():
         for label in labels:
-            task_id = label.split(":")[0]
-            if original_status.get(task_id) != new_status:
-                st.session_state.df.loc[st.session_state.df.ID == task_id, "Status"] = new_status
-                changed = True
+            parts = label.split(":")
+            if len(parts) > 1:
+                task_id = parts[0].strip()
+                if original_status.get(task_id) != new_status:
+                    st.session_state.df.loc[st.session_state.df.ID ==
+                                            task_id, "Status"] = new_status
+                    changed = True
     if changed:
         update_tasks(st.session_state.df)
         st.session_state.df = fetch_tasks()
