@@ -261,7 +261,7 @@ with tab_board:
         st.info("No tasks to display in board view.")
     else:
         try:
-            # Remove 'styles' argument, only use supported arguments
+            # Remove all code after this block, only use supported arguments for sort_items
             sorted_columns = sort_items(
                 columns_payload,
                 multi_containers=True,
@@ -290,6 +290,8 @@ with tab_board:
                         changed = True
         if changed:
             update_tasks(st.session_state.df)
+            st.session_state.df = fetch_tasks()
+            st.experimental_rerun()
             st.session_state.df = fetch_tasks()
             st.experimental_rerun()
                         "border": "1px solid #555",
