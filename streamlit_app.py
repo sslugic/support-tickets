@@ -135,16 +135,16 @@ if submitted:
 # View and edit existing tickets
 st.header("Existing task tickets")
 
-# Add filter UI
-status_options = ["All"] + sorted(st.session_state.df["Status"].unique())
-priority_options = ["All"] + sorted(st.session_state.df["Priority"].unique())
-selected_status = st.selectbox("Filter by Status", status_options)
-selected_priority = st.selectbox("Filter by Priority", priority_options)
-
+# Single dropdown for filter type, then show appropriate filter
+filter_type = st.selectbox("Filter by...", ["None", "Status", "Priority"])
 filtered_df = st.session_state.df.copy()
-if selected_status != "All":
+if filter_type == "Status":
+    status_options = sorted(st.session_state.df["Status"].unique())
+    selected_status = st.selectbox("Select Status", status_options)
     filtered_df = filtered_df[filtered_df.Status == selected_status]
-if selected_priority != "All":
+elif filter_type == "Priority":
+    priority_options = sorted(st.session_state.df["Priority"].unique())
+    selected_priority = st.selectbox("Select Priority", priority_options)
     filtered_df = filtered_df[filtered_df.Priority == selected_priority]
 
 st.write(f"Number of task tickets: `{len(filtered_df)}`")
