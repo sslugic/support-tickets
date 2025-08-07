@@ -97,7 +97,9 @@ def update_tasks(df):
 
 
 def ensure_due_date_is_date(df):
-    if df["Due Date"].dtype == "O":
+    # Ensure Due Date is always datetime.date for compatibility with st.data_editor
+    df = df.copy()
+    if "Due Date" in df.columns:
         df["Due Date"] = pd.to_datetime(
             df["Due Date"], errors="coerce").dt.date
     return df
@@ -133,6 +135,8 @@ if submitted:
     st.write("Task ticket submitted! Here are the ticket details:")
     st.dataframe(df_new, use_container_width=True, hide_index=True)
     st.session_state.df = fetch_tasks()
+    st.session_state.df = ensure_due_date_is_date(
+        st.session_state.df)  # Ensure correct type after adding
 
 # Tabs for Table and Board View
 tab_table, tab_board = st.tabs(["Table View", "Board View"])
@@ -162,6 +166,9 @@ with tab_table:
 
     st.session_state.df = fetch_tasks()  # Always fetch sorted
     st.session_state.df = ensure_due_date_is_date(st.session_state.df)
+    # Ensure correct type before editing
+    filtered_df = ensure_due_date_is_date(filtered_df)
+
     edited_df = st.data_editor(
         filtered_df,
         use_container_width=True,
@@ -243,7 +250,8 @@ with tab_board:
         items = []
         for _, r in board_df[board_df.Status == status].iterrows():
             task_id = str(r["ID"]) if "ID" in r and r["ID"] is not None else ""
-            task_text = str(r["Task"]) if "Task" in r and r["Task"] is not None else ""
+            task_text = str(
+                r["Task"]) if "Task" in r and r["Task"] is not None else ""
             label = f"{task_id}: {task_text[:40]}{'...' if len(task_text) > 40 else ''}"
             # Only add if task_id is not empty
             if task_id:
@@ -305,7 +313,8 @@ with tab_board:
                 if len(parts) > 1:
                     task_id = parts[0].strip()
                     if original_status.get(task_id) != new_status:
-                        st.session_state.df.loc[st.session_state.df.ID == task_id, "Status"] = new_status
+                        st.session_state.df.loc[st.session_state.df.ID ==
+                                                task_id, "Status"] = new_status
                         changed = True
         if changed:
             update_tasks(st.session_state.df)
