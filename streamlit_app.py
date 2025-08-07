@@ -253,51 +253,59 @@ with tab_board:
             task_text = str(
                 r["Task"]) if "Task" in r and r["Task"] is not None else ""
             label = f"{task_id}: {task_text[:40]}{'...' if len(task_text) > 40 else ''}"
-            # Only add if task_id is not empty
-            if task_id:
+            # Only add if task_id and task_text are not empty and not nan
+            if task_id and task_id != "nan" and task_text and task_text != "nan":
                 items.append(label)
-        columns_payload[status] = items
-
-    # Remove any empty columns (streamlit-sortables bug workaround)
-    columns_payload = {k: v for k, v in columns_payload.items() if v}
+        # Only add non-empty lists
+        if items:
+            columns_payload[status] = items
 
     # If all columns are empty, show a message and skip sort_items
-    if not any(columns_payload.values()):
+    if not columns_payload:
         st.info("No tasks to display in board view.")
     else:
-        sorted_columns = sort_items(
-            columns_payload,
-            multi_containers=True,
-            direction="vertical",
-            styles={
-                "container": {
-                    "border": "1px solid #444",
-                    "borderRadius": "6px",
-                    "background": "#181818",
-                    "padding": "8px",
-                    "minHeight": "420px"
+        # Ensure all values are lists of strings (no None, no NaN)
+        for k, v in columns_payload.items():
+            columns_payload[k] = [str(x) for x in v if x and x != "nan"]
+
+        try:
+            sorted_columns = sort_items(
+                columns_payload,
+                multi_containers=True,
+                direction="vertical",
+                styles={
+                    "container": {
+                        "border": "1px solid #444",
+                        "borderRadius": "6px",
+                        "background": "#181818",
+                        "padding": "8px",
+                        "minHeight": "420px"
+                    },
+                    "containerHeader": {
+                        "fontWeight": "600",
+                        "padding": "4px 0 8px 0",
+                        "color": "#eee",
+                        "textAlign": "center"
+                    },
+                    "item": {
+                        "padding": "8px",
+                        "margin": "6px 0",
+                        "border": "1px solid #555",
+                        "borderRadius": "6px",
+                        "background": "linear-gradient(135deg,#242424,#303030)",
+                        "color": "#fafafa",
+                        "fontSize": "12px",
+                        "lineHeight": "1.3",
+                        "boxShadow": "2px 2px 4px rgba(0,0,0,0.4)",
+                        "cursor": "grab"
+                    },
+                    "draggingItem": {"opacity": "0.35"},
                 },
-                "containerHeader": {
-                    "fontWeight": "600",
-                    "padding": "4px 0 8px 0",
-                    "color": "#eee",
-                    "textAlign": "center"
-                },
-                "item": {
-                    "padding": "8px",
-                    "margin": "6px 0",
-                    "border": "1px solid #555",
-                    "borderRadius": "6px",
-                    "background": "linear-gradient(135deg,#242424,#303030)",
-                    "color": "#fafafa",
-                    "fontSize": "12px",
-                    "lineHeight": "1.3",
-                    "boxShadow": "2px 2px 4px rgba(0,0,0,0.4)",
-                    "cursor": "grab"
-                },
-                "draggingItem": {"opacity": "0.35"},
-            },
-        )
+            )
+        except Exception as e:
+            st.error(f"Board view error: {e}")
+            sorted_columns = columns_payload
+
         # Defensive: only update if label format is correct
         original_status = {}
         for status, labels in columns_payload.items():
