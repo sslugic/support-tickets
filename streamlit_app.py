@@ -303,22 +303,6 @@ with tab_board:
             st.session_state.df = fetch_tasks()
             st.experimental_rerun()
             st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
-                        "border": "1px solid #555",
-                        "borderRadius": "6px",
-                        "background": "linear-gradient(135deg,#242424,#303030)",
-                        "color": "#fafafa",
-                        "fontSize": "12px",
-                        "lineHeight": "1.3",
-                        "boxShadow": "2px 2px 4px rgba(0,0,0,0.4)",
-                        "cursor": "grab"
-                    },
-                    "draggingItem": {"opacity": "0.35"},
-                },
-            )
-        except Exception as e:
-            st.error(f"Board view error: {e}")
-            sorted_columns = columns_payload
 
         # Defensive: only update if label format is correct
         original_status = {}
