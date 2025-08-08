@@ -149,6 +149,23 @@ with tab_table:
     # View and edit existing tickets
     st.header("Existing task tickets")
 
+    # Column visibility controls
+    st.subheader("Column Visibility")
+    col_vis1, col_vis2, col_vis3 = st.columns(3)
+    
+    with col_vis1:
+        show_id = st.checkbox("Show ID", value=True)
+        show_task = st.checkbox("Show Task", value=True)
+        show_status = st.checkbox("Show Status", value=True)
+    
+    with col_vis2:
+        show_priority = st.checkbox("Show Priority", value=True)
+        show_date_submitted = st.checkbox("Show Date Submitted", value=True)
+        show_due_date = st.checkbox("Show Due Date", value=True)
+    
+    with col_vis3:
+        show_delete = st.checkbox("Show Delete Column", value=True)
+
     # Single dropdown for filter type, then show appropriate filter
     filter_type = st.selectbox("Filter by...", ["None", "Status", "Priority"])
     filtered_df = st.session_state.df.copy()
@@ -173,59 +190,106 @@ with tab_table:
     # Ensure correct type before editing
     filtered_df = ensure_due_date_is_date(filtered_df)
     
-    # Add delete column
-    filtered_df["Delete"] = False
+    # Add delete column if needed
+    if show_delete:
+        filtered_df["Delete"] = False
+
+    # Filter columns based on visibility settings
+    columns_to_show = []
+    if show_id:
+        columns_to_show.append("ID")
+    if show_task:
+        columns_to_show.append("Task")
+    if show_status:
+        columns_to_show.append("Status")
+    if show_priority:
+        columns_to_show.append("Priority")
+    if show_date_submitted:
+        columns_to_show.append("Date Submitted")
+    if show_due_date:
+        columns_to_show.append("Due Date")
+    if show_delete:
+        columns_to_show.append("Delete")
+    
+    # Filter the dataframe to only show selected columns
+    display_df = filtered_df[columns_to_show]
+
+    # Build column config based on visible columns
+    column_config = {}
+    disabled_cols = []
+    
+    if show_status:
+        column_config["Status"] = st.column_config.SelectboxColumn(
+            "Status",
+            help="Task ticket status",
+            options=["Open", "In Progress", "Closed"],
+            required=True,
+        )
+    
+    if show_priority:
+        column_config["Priority"] = st.column_config.SelectboxColumn(
+            "Priority",
+            help="Priority",
+            options=["High", "Medium", "Low"],
+            required=True,
+        )
+    
+    if show_due_date:
+        column_config["Due Date"] = st.column_config.DateColumn(
+            "Due Date",
+            help="Due date for the task",
+            format="YYYY-MM-DD",
+            required=True,
+        )
+    
+    if show_delete:
+        column_config["Delete"] = st.column_config.CheckboxColumn(
+            "❌",
+            help="Check to delete this task",
+            width="small",
+        )
+    
+    if show_id:
+        disabled_cols.append("ID")
+    if show_date_submitted:
+        disabled_cols.append("Date Submitted")
 
     edited_df = st.data_editor(
-        filtered_df,
+        display_df,
         use_container_width=True,
         hide_index=True,
-        column_config={
-            "Status": st.column_config.SelectboxColumn(
-                "Status",
-                help="Task ticket status",
-                options=["Open", "In Progress", "Closed"],
-                required=True,
-            ),
-            "Priority": st.column_config.SelectboxColumn(
-                "Priority",
-                help="Priority",
-                options=["High", "Medium", "Low"],
-                required=True,
-            ),
-            "Due Date": st.column_config.DateColumn(
-                "Due Date",
-                help="Due date for the task",
-                format="YYYY-MM-DD",
-                required=True,
-            ),
-            "Delete": st.column_config.CheckboxColumn(
-                "❌",
-                help="Check to delete this task",
-                width="small",
-            ),
-        },
-        disabled=["ID", "Date Submitted"],
+        column_config=column_config,
+        disabled=disabled_cols,
         key="task_editor",
         num_rows="fixed"
     )
 
     # Handle deletions
-    tasks_to_delete = edited_df[edited_df["Delete"] == True]
-    if not tasks_to_delete.empty:
-        for _, task in tasks_to_delete.iterrows():
-            delete_task(task["ID"])
-        st.session_state.df = fetch_tasks()
-        st.session_state.df = ensure_due_date_is_date(st.session_state.df)
-        st.success(f"Deleted {len(tasks_to_delete)} task(s).")
-        st.rerun()
+    if show_delete and "Delete" in edited_df.columns:
+        tasks_to_delete = edited_df[edited_df["Delete"] == True]
+        if not tasks_to_delete.empty:
+            for _, task in tasks_to_delete.iterrows():
+                delete_task(task["ID"])
+            st.session_state.df = fetch_tasks()
+            st.session_state.df = ensure_due_date_is_date(st.session_state.df)
+            st.success(f"Deleted {len(tasks_to_delete)} task(s).")
+            st.rerun()
     
-    # Handle other edits (remove Delete column before comparison)
-    edited_df_clean = edited_df.drop(columns=["Delete"])
-    filtered_df_clean = filtered_df.drop(columns=["Delete"])
+    # Handle other edits (remove Delete column before comparison if it exists)
+    edited_df_clean = edited_df.drop(columns=["Delete"]) if "Delete" in edited_df.columns else edited_df
+    display_df_clean = display_df.drop(columns=["Delete"]) if "Delete" in display_df.columns else display_df
     
-    if not edited_df_clean.equals(filtered_df_clean):
-        update_tasks(edited_df_clean)
+    if not edited_df_clean.equals(display_df_clean):
+        # Map the edited data back to the full dataframe
+        for idx, row in edited_df_clean.iterrows():
+            if "ID" in row:
+                task_id = row["ID"]
+                mask = st.session_state.df["ID"] == task_id
+                for col in edited_df_clean.columns:
+                    if col in st.session_state.df.columns:
+                        st.session_state.df.loc[mask, col] = row[col]
+        
+        update_tasks(st.session_state.df)
         st.session_state.df = fetch_tasks()
         st.success("Changes saved.")
 
