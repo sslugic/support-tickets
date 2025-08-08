@@ -96,6 +96,10 @@ def update_tasks(df):
     collection.insert_many(df.to_dict("records"))
 
 
+def delete_task(task_id):
+    collection.delete_one({"ID": task_id})
+
+
 def ensure_due_date_is_date(df):
     # Ensure Due Date is always datetime.date for compatibility with st.data_editor
     df = df.copy()
@@ -139,7 +143,7 @@ if submitted:
         st.session_state.df)  # Ensure correct type after adding
 
 # Tabs for Table and Board View
-tab_table, tab_board = st.tabs(["Table View", "Board View"])
+tab_table = st.container()
 
 with tab_table:
     # View and edit existing tickets
@@ -168,6 +172,9 @@ with tab_table:
     st.session_state.df = ensure_due_date_is_date(st.session_state.df)
     # Ensure correct type before editing
     filtered_df = ensure_due_date_is_date(filtered_df)
+    
+    # Add delete column
+    filtered_df["Delete"] = False
 
     edited_df = st.data_editor(
         filtered_df,
@@ -192,14 +199,33 @@ with tab_table:
                 format="YYYY-MM-DD",
                 required=True,
             ),
+            "Delete": st.column_config.CheckboxColumn(
+                "❌",
+                help="Check to delete this task",
+                width="small",
+            ),
         },
         disabled=["ID", "Date Submitted"],
         key="task_editor",
         num_rows="fixed"
     )
 
-    if not edited_df.equals(filtered_df):
-        update_tasks(edited_df)
+    # Handle deletions
+    tasks_to_delete = edited_df[edited_df["Delete"] == True]
+    if not tasks_to_delete.empty:
+        for _, task in tasks_to_delete.iterrows():
+            delete_task(task["ID"])
+        st.session_state.df = fetch_tasks()
+        st.session_state.df = ensure_due_date_is_date(st.session_state.df)
+        st.success(f"Deleted {len(tasks_to_delete)} task(s).")
+        st.rerun()
+    
+    # Handle other edits (remove Delete column before comparison)
+    edited_df_clean = edited_df.drop(columns=["Delete"])
+    filtered_df_clean = filtered_df.drop(columns=["Delete"])
+    
+    if not edited_df_clean.equals(filtered_df_clean):
+        update_tasks(edited_df_clean)
         st.session_state.df = fetch_tasks()
         st.success("Changes saved.")
 
@@ -240,56 +266,3 @@ with tab_table:
         )
     )
     st.altair_chart(priority_plot, use_container_width=True, theme="streamlit")
-
-with tab_board:
-    st.header("Board View")
-    statuses = ["Open", "In Progress", "Closed"]
-    board_df = st.session_state.df.copy()
-
-    columns_payload = {}
-    for status in statuses:
-        items = []
-        for _, r in board_df[board_df.Status == status].iterrows():
-            task_id = str(r["ID"]) if "ID" in r and r["ID"] is not None else ""
-            task_text = str(
-                r["Task"]) if "Task" in r and r["Task"] is not None else ""
-            label = f"{task_id}: {task_text[:40]}{'...' if len(task_text) > 40 else ''}"
-            if task_id and task_id != "nan" and task_text and task_text != "nan":
-                items.append(label)
-        if items:
-            columns_payload[status] = items
-
-    if not columns_payload:
-        st.info("No tasks to display in board view.")
-    else:
-        # Only use supported arguments for sort_items
-        sorted_columns = sort_items(
-            columns_payload,
-            multi_containers=True,
-            direction="vertical"
-        )
-
-        # Check for status changes
-        original_status = {}
-        for status, labels in columns_payload.items():
-            for label in labels:
-                parts = label.split(":")
-                if len(parts) > 1:
-                    task_id = parts[0].strip()
-                    original_status[task_id] = status
-
-        changed = False
-        for new_status, labels in sorted_columns.items():
-            for label in labels:
-                parts = label.split(":")
-                if len(parts) > 1:
-                    task_id = parts[0].strip()
-                    if original_status.get(task_id) != new_status:
-                        st.session_state.df.loc[st.session_state.df.ID == task_id, "Status"] = new_status
-                        changed = True
-
-        if changed:
-            update_tasks(st.session_state.df)
-            st.session_state.df = fetch_tasks()
-            st.session_state.df = ensure_due_date_is_date(st.session_state.df)
-            st.rerun()
