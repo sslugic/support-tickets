@@ -1,4 +1,6 @@
 streamlit
-streamlit-elements
 streamlit-sortables
 pymongo
+altair
+numpy
+pandas

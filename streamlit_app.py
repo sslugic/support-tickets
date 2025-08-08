@@ -194,6 +194,8 @@ with tab_table:
             ),
         },
         disabled=["ID", "Date Submitted"],
+        key="task_editor",
+        num_rows="fixed"
     )
 
     if not edited_df.equals(filtered_df):
@@ -267,6 +269,7 @@ with tab_board:
             direction="vertical"
         )
 
+        # Check for status changes
         original_status = {}
         for status, labels in columns_payload.items():
             for label in labels:
@@ -274,44 +277,7 @@ with tab_board:
                 if len(parts) > 1:
                     task_id = parts[0].strip()
                     original_status[task_id] = status
-        changed = False
-        for new_status, labels in sorted_columns.items():
-            for label in labels:
-                parts = label.split(":")
-                if len(parts) > 1:
-                    task_id = parts[0].strip()
-                    if original_status.get(task_id) != new_status:
-                        st.session_state.df.loc[st.session_state.df.ID ==
-                            task_id, "Status"] = new_status
-                        changed = True
-        if changed:
-            update_tasks(st.session_state.df)
-            st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
-            st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
-            st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
-            st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
-            st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
-        if changed:
-            update_tasks(st.session_state.df)
-            st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
-            st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
-            st.session_state.df = fetch_tasks()
 
-        # Defensive: only update if label format is correct
-        original_status = {}
-        for status, labels in columns_payload.items():
-            for label in labels:
-                parts = label.split(":")
-                if len(parts) > 1:
-                    task_id = parts[0].strip()
-                    original_status[task_id] = status
         changed = False
         for new_status, labels in sorted_columns.items():
             for label in labels:
@@ -319,10 +285,11 @@ with tab_board:
                 if len(parts) > 1:
                     task_id = parts[0].strip()
                     if original_status.get(task_id) != new_status:
-                        st.session_state.df.loc[st.session_state.df.ID ==
-                                                task_id, "Status"] = new_status
+                        st.session_state.df.loc[st.session_state.df.ID == task_id, "Status"] = new_status
                         changed = True
+
         if changed:
             update_tasks(st.session_state.df)
             st.session_state.df = fetch_tasks()
-            st.experimental_rerun()
+            st.session_state.df = ensure_due_date_is_date(st.session_state.df)
+            st.rerun()
